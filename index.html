@@ -1,0 +1,417 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { Shield, Target, Zap, Trophy, Ship, Swords, Info, X, Instagram, School, User, Clock, Flame, AlertCircle } from 'lucide-react';
+
+const BANK_SOAL = {
+  "Tekanan": [
+    { q: "Tekanan didefinisikan secara fisis sebagai...", a: ["Gaya per satuan luas ($P = F/A$)", "Massa per satuan volume", "Energi per satuan waktu", "Gaya kali jarak"], c: 0, dmg: 15 },
+    { q: "Satuan SI untuk tekanan adalah Pascal (Pa), yang nilainya setara dengan...", a: ["$1$ $N/m^{2}$", "$1$ $kg/m^{3}$", "$1$ $J/s$", "$1$ $N.m$"], c: 0, dmg: 15 },
+    { q: "Sebuah peti seberat $400$ $N$ diletakkan di lantai dengan luas alas $2$ $m^{2}$. Tekanan yang dihasilkan adalah...", a: ["$200$ $Pa$", "$800$ $Pa$", "$400$ $Pa$", "$100$ $Pa$"], c: 0, dmg: 15 },
+    { q: "Tekanan hidrostatis pada kedalaman $5$ $m$ di air tawar ($\rho = 1000$ $kg/m^{3}$, $g = 10$ $m/s^{2}$) adalah...", a: ["$50.000$ $Pa$", "$5.000$ $Pa$", "$500$ $Pa$", "$500.000$ $Pa$"], c: 0, dmg: 15 },
+    { q: "Alat yang digunakan khusus untuk mengukur tekanan udara luar disebut...", a: ["Barometer", "Manometer", "Termometer", "Hidrometer"], c: 0, dmg: 15 },
+    { q: "Makin dalam posisi seseorang menyelam, maka tekanan hidrostatis yang dirasakan akan...", a: ["Meningkat", "Menurun", "Tetap konstan", "Hilang"], c: 0, dmg: 15 },
+    { q: "Besar tekanan hidrostatis pada suatu titik di dalam zat cair tidak bergantung pada...", a: ["Bentuk wadah", "Kedalaman titik", "Massa jenis fluida", "Percepatan gravitasi"], c: 0, dmg: 15 },
+    { q: "Seekor ikan berada $2$ $m$ di bawah permukaan air ($\rho = 1000$ $kg/m^{3}$). Tekanan hidrostatisnya adalah...", a: ["$20$ $kPa$", "$2$ $kPa$", "$200$ $kPa$", "$0,2$ $kPa$"], c: 0, dmg: 15 },
+    { q: "Mengapa dinding bendungan bagian bawah dibuat lebih tebal daripada bagian atas?", a: ["Karena tekanan di bawah lebih besar", "Karena debit air lebih kecil", "Agar suhu air tetap dingin", "Untuk melawan gaya magnet"], c: 0, dmg: 15 },
+    { q: "Tekanan gas dalam ruang tertutup biasanya diukur menggunakan alat...", a: ["Manometer", "Anemometer", "Barometer", "Hygrometer"], c: 0, dmg: 15 },
+    { q: "Satuan tekanan standar $1$ $atm$ setara dengan tekanan setinggi... $cmHg$.", a: ["$76$", "$100$", "$10$", "$101$"], c: 0, dmg: 15 },
+    { q: "Jika gaya tekan tetap, namun luas alas penampang diperkecil menjadi setengahnya, maka tekanan akan...", a: ["Menjadi $2 \times$ lipat", "Menjadi $1/2 \times$ lipat", "Tetap sama", "Menjadi $4 \times$ lipat"], c: 0, dmg: 15 },
+    { q: "Tekanan yang diberikan oleh zat cair yang berada dalam keadaan diam disebut...", a: ["Tekanan Hidrostatis", "Tekanan Atmosfer", "Tekanan Gauge", "Tekanan Absolut"], c: 0, dmg: 15 },
+    { q: "Benda dengan luas alas paling kecil akan menghasilkan tekanan... pada permukaan lantai.", a: ["Terbesar", "Terkecil", "Sama saja", "Nol"], c: 0, dmg: 15 },
+    { q: "Dimensi dari besaran tekanan dalam fisika adalah...", a: ["$[M][L]^{-1}[T]^{-2}$", "$[M][L][T]^{-2}$", "$[L][T]^{-1}$", "$[M][L]^{2}[T]^{-2}$"], c: 0, dmg: 15 }
+  ],
+  "Hukum Pascal": [
+    { q: "Hukum Pascal menyatakan bahwa tekanan yang diberikan pada zat cair dalam ruang tertutup akan...", a: ["Diteruskan ke segala arah sama besar", "Berkurang seiring bertambahnya jarak", "Hanya menekan ke arah bawah", "Bergantung pada volume wadah"], c: 0, dmg: 35 },
+    { q: "Dongkrak hidrolik memiliki piston kecil $5$ $cm^{2}$ dan besar $50$ $cm^{2}$. Gaya $100$ $N$ di piston kecil menghasilkan gaya...", a: ["$1000$ $N$", "$500$ $N$", "$100$ $N$", "$50$ $N$"], c: 0, dmg: 35 },
+    { q: "Mesin pengangkat mobil di bengkel bekerja berdasarkan prinsip...", a: ["Hukum Pascal", "Hukum Archimedes", "Hukum Newton", "Asas Bernoulli"], c: 0, dmg: 35 },
+    { q: "Rasio luas penampang hidrolik $1:20$. Untuk mengangkat beban $4000$ $N$, diperlukan gaya input sebesar...", a: ["$200$ $N$", "$400$ $N$", "$80$ $N$", "$20$ $N$"], c: 0, dmg: 35 },
+    { q: "Sistem pengereman pada mobil (rem hidrolik) memanfaatkan prinsip fisika...", a: ["Hukum Pascal", "Hukum Archimedes", "Gaya Gesek", "Hukum Stoke"], c: 0, dmg: 35 },
+    { q: "Keuntungan mekanik sistem hidrolik dengan diameter piston $D_{1}=2$ $cm$ dan $D_{2}=10$ $cm$ adalah...", a: ["$25$", "$5$", "$10$", "$50$"], c: 0, dmg: 35 },
+    { q: "Piston besar mampu mengangkat beban $10$ $kN$ dengan gaya input $200$ $N$. Perbandingan luas penampangnya...", a: ["$50:1$", "$20:1$", "$100:1$", "$10:1$"], c: 0, dmg: 35 },
+    { q: "Fluida kerja yang digunakan dalam sistem hidrolik idealnya harus bersifat...", a: ["Inkompresibel (tidak dapat ditekan)", "Kompresibel (mudah ditekan)", "Sangat encer", "Mudah menguap"], c: 0, dmg: 35 },
+    { q: "Jika tekanan $2000$ $Pa$ diberikan pada piston kecil, maka tekanan yang muncul di piston besar adalah...", a: ["$2000$ $Pa$", "$4000$ $Pa$", "$1000$ $Pa$", "$0$ $Pa$"], c: 0, dmg: 35 },
+    { q: "Jika jari-jari piston output dibuat $3$ kali jari-jari input, maka gaya output menjadi...", a: ["$9 \times$ gaya input", "$3 \times$ gaya input", "$6 \times$ gaya input", "$1/3 \times$ gaya input"], c: 0, dmg: 35 },
+    { q: "Pada kempa hidrolik, volume cairan yang dipindahkan piston kecil... volume yang diterima piston besar.", a: ["Sama dengan", "Lebih besar dari", "Lebih kecil dari", "Selalu dua kali lipat"], c: 0, dmg: 35 },
+    { q: "Gaya $20$ $N$ diberikan pada piston seluas $2$ $m^{2}$. Tekanan yang diteruskan adalah...", a: ["$10$ $N/m^{2}$", "$5$ $N/m^{2}$", "$40$ $N/m^{2}$", "$0,1$ $N/m^{2}$"], c: 0, dmg: 35 },
+    { q: "Sistem hidrolik memberikan keuntungan mekanis bagi manusia karena dapat...", a: ["Menggandakan gaya", "Mengurangi energi total", "Menghilangkan gesekan", "Mempercepat waktu kerja"], c: 0, dmg: 35 },
+    { q: "Gaya $15$ $N$ yang bekerja pada luas $A=5$ $cm^{2}$ akan menghasilkan tekanan sebesar...", a: ["$30.000$ $Pa$", "$3$ $Pa$", "$300$ $Pa$", "$75$ $Pa$"], c: 0, dmg: 35 },
+    { q: "Pengoperasian kursi pasien pada dokter gigi merupakan aplikasi dari...", a: ["Hukum Pascal", "Hukum Archimedes", "Gejala Kapilaritas", "Viskositas Fluida"], c: 0, dmg: 35 }
+  ],
+  "Hukum Archimedes": [
+    { q: "Sebuah balok terapung di air ($\rho=1000$ $kg/m^{3}$) dengan $40\%$ volumenya muncul di permukaan. Massa jenis balok adalah...", a: ["$600$ $kg/m^{3}$", "$400$ $kg/m^{3}$", "$1000$ $kg/m^{3}$", "$1400$ $kg/m^{3}$"], c: 0, dmg: 25 },
+    { q: "Benda bermassa $10$ $kg$ tercelup seluruhnya dalam cairan ($\rho=800$ $kg/m^{3}$). Jika volume benda $0,005$ $m^{3}$, gaya Archimedesnya...", a: ["$40$ $N$", "$50$ $N$", "$80$ $N$", "$100$ $N$"], c: 0, dmg: 25 },
+    { q: "Sepotong emas ($m=193$ $g$) ditimbang dalam air seolah massanya menjadi $183$ $g$. Berapa volume emas tersebut?", a: ["$10$ $cm^{3}$", "$19,3$ $cm^{3}$", "$18,3$ $cm^{3}$", "$1$ $cm^{3}$"], c: 0, dmg: 25 },
+    { q: "Benda terapung dalam minyak ($\rho=0,8$ $g/cm^{3}$) dengan $1/2$ bagian tercelup. Massa jenis benda tersebut adalah...", a: ["$0,4$ $g/cm^{3}$", "$0,8$ $g/cm^{3}$", "$1,6$ $g/cm^{3}$", "$0,2$ $g/cm^{3}$"], c: 0, dmg: 25 },
+    { q: "Balok kayu $V=2000$ $cm^{3}$ terapung di air. Jika $1200$ $cm^{3}$ berada di bawah permukaan, gaya angkat air sebesar...", a: ["$12$ $N$", "$20$ $N$", "$8$ $N$", "$1,2$ $N$"], c: 0, dmg: 25 },
+    { q: "Sebuah kapal seberat $50.000$ $kN$ meluncur ke laut. Berapa volume air laut ($\rho=1025$ $kg/m^{3}$) yang dipindahkan kapal?", a: ["$4878$ $m^{3}$", "$5000$ $m^{3}$", "$5125$ $m^{3}$", "$1025$ $m^{3}$"], c: 0, dmg: 25 },
+    { q: "Massa jenis es $0,9$ $g/cm^{3}$ dan air laut $1,03$ $g/cm^{3}$. Persentase volume es yang tercelup adalah sekitar...", a: ["$87,4\%$", "$90,0\%$", "$10,0\%$", "$93,2\%$"], c: 0, dmg: 25 },
+    { q: "Benda melayang di air jika berat benda ($W$) dan gaya Archimedes ($F_{a}$) memenuhi...", a: ["$W = F_{a}$", "$W > F_{a}$", "$W < F_{a}$", "$W = 0$"], c: 0, dmg: 25 },
+    { q: "Dua benda $A$ dan $B$ identik volumenya. $A$ terapung di air, $B$ terapung di minyak. Gaya apung mana yang lebih besar?", a: ["Sama besar (karena berat benda sama)", "Gaya apung di air lebih besar", "Gaya apung di minyak lebih besar", "Tergantung suhu"], c: 0, dmg: 25 },
+    { q: "Syarat benda tenggelam di dasar wadah zat cair adalah...", a: ["$\rho_{benda} > \rho_{fluida}$", "$\rho_{benda} < \rho_{fluida}$", "$\rho_{benda} = \rho_{fluida}$", "$W < F_{a}$"], c: 0, dmg: 25 },
+    { q: "Besar gaya apung ($F_{a}$) yang dialami benda di dalam fluida sama dengan...", a: ["Berat fluida yang dipindahkan", "Berat benda saat di udara", "Massa total benda", "Volume total benda"], c: 0, dmg: 25 },
+    { q: "Berat benda di udara $50$ $N$, berat saat di dalam air $45$ $N$. Gaya Archimedesnya adalah...", a: ["$5$ $N$", "$50$ $N$", "$45$ $N$", "$95$ $N$"], c: 0, dmg: 25 },
+    { q: "Kapal selam dapat melayang di dalam air dengan cara...", a: ["Mengatur volume air di tangki pemberat", "Memperbesar tenaga mesin", "Memperkecil volume kapal", "Melepas jangkar ke dasar"], c: 0, dmg: 25 },
+    { q: "Alat pengukur massa jenis zat cair yang menggunakan prinsip Archimedes adalah...", a: ["Hidrometer", "Termometer", "Barometer", "Anemometer"], c: 0, dmg: 25 },
+    { q: "Kapal laut yang terbuat dari baja tidak tenggelam karena...", a: ["Volume rongganya besar sehingga gaya apung kuat", "Baja lebih ringan dari air laut", "Gaya dorong mesin ke atas", "Air laut lebih asin"], c: 0, dmg: 25 }
+  ],
+  "Karakteristik Fluida Lainnya": [
+    { q: "Besarnya gaya tegangan permukaan pada kawat sepanjang $L$ dinyatakan dengan rumus...", a: ["$\gamma = F/d$ atau $\gamma = F/2L$", "$\gamma = F \cdot L$", "$\gamma = P/A$", "$\gamma = \rho \cdot g \cdot h$"], c: 0, dmg: 20 },
+    { q: "Sebuah silet bermassa $m$ dapat terapung di air karena adanya...", a: ["Tegangan permukaan", "Gaya Archimedes", "Hukum Pascal", "Viskositas fluida"], c: 0, dmg: 20 },
+    { q: "Kenaikan permukaan air dalam pipa kapiler sebanding dengan tegangan permukaan dan...", a: ["$\cos \theta$ (sudut kontak)", "Massa jenis cairan", "Jari-jari pipa", "Gravitasi bumi"], c: 0, dmg: 20 },
+    { q: "Air cenderung membentuk tetesan bulat karena...", a: ["Tegangan permukaan meminimalkan luas area", "Gaya gravitasi menarik ke pusat", "Adanya tekanan udara luar", "Air bersifat inkompresibel"], c: 0, dmg: 20 },
+    { q: "Satuan tegangan permukaan dalam SI adalah...", a: ["$N/m$", "$N \cdot m$", "$N/m^{2}$", "$J/m^{2}$"], c: 0, dmg: 20 },
+    { q: "Zat cair yang memiliki sudut kontak $\theta > 90^{\circ}$ akan mengakibatkan...", a: ["Meniskus cembung", "Meniskus cekung", "Permukaan datar", "Zat cair membasahi dinding"], c: 0, dmg: 20 },
+    { q: "Penambahan sabun atau deterjen ke dalam air akan mengakibatkan...", a: ["Tegangan permukaan menurun", "Tegangan permukaan meningkat", "Viskositas air hilang", "Massa jenis air berkurang"], c: 0, dmg: 20 },
+    { q: "Mengapa air panas lebih efektif untuk mencuci pakaian daripada air dingin?", a: ["Tegangan permukaan air panas lebih rendah", "Air panas lebih kental (viskos)", "Air panas memiliki gaya kohesi lebih besar", "Massa jenis air panas lebih besar"], c: 0, dmg: 20 },
+    { q: "Sifat kekentalan pada fluida yang menghambat aliran zat cair disebut...", a: ["Viskositas", "Kapilaritas", "Adhesi", "Kohesi"], c: 0, dmg: 20 },
+    { q: "Tegangan permukaan pada zat cair disebabkan oleh adanya gaya...", a: ["Kohesi antar molekul air", "Adhesi air dengan wadah", "Gravitasi bumi", "Sentrifugal"], c: 0, dmg: 20 },
+    { q: "Peristiwa naiknya zat cair melalui pembuluh atau celah sempit disebut...", a: ["Kapilaritas", "Efek Meniskus", "Viskositas", "Hukum Pascal"], c: 0, dmg: 20 },
+    { q: "Serangga air (anggang-anggang) dapat berjalan di permukaan air karena...", a: ["Tegangan permukaan", "Efek Viskositas", "Gaya Kapilaritas", "Hukum Pascal"], c: 0, dmg: 20 },
+    { q: "Meniskus cembung terjadi pada air raksa di dalam tabung kaca karena...", a: ["Kohesi > Adhesi", "Adhesi > Kohesi", "Gaya gravitasi kuat", "Suhu raksa tinggi"], c: 0, dmg: 20 },
+    { q: "Satuan koefisien viskositas ($\eta$) dalam sistem SI adalah...", a: ["$Pa \cdot s$", "$N/m$", "$kg/m$", "$Joule$"], c: 0, dmg: 20 },
+    { q: "Oli lebih sulit mengalir daripada air karena oli memiliki... yang lebih besar.", a: ["Viskositas", "Densitas", "Tegangan permukaan", "Gaya Adhesi"], c: 0, dmg: 20 },
+    { q: "Zat cair akan membasahi dinding wadah (kaca) apabila...", a: ["Gaya Adhesi > Kohesi", "Gaya Kohesi > Adhesi", "Massa jenisnya besar", "Tegangan permukaannya kecil"], c: 0, dmg: 20 },
+    { q: "Gaya tarik-menarik antar molekul yang sejenis disebut...", a: ["Gaya Kohesi", "Gaya Adhesi", "Gaya Friksi", "Tegangan Antarmuka"], c: 0, dmg: 20 },
+    { q: "Prinsip kapilaritas pada sumbu kompor minyak menyebabkan minyak tanah...", a: ["Naik ke atas sumbu", "Turun ke bawah wadah", "Diam di tempat", "Menguap dengan cepat"], c: 0, dmg: 20 },
+    { q: "Bentuk permukaan lengkung zat cair di dalam tabung disebut...", a: ["Meniskus", "Kapiler", "Viskos", "Fluida"], c: 0, dmg: 20 },
+    { q: "Apabila suhu zat cair dinaikkan, maka koefisien viskositasnya akan...", a: ["Menurun (makin encer)", "Meningkat (makin kental)", "Tetap stabil", "Menjadi nol"], c: 0, dmg: 20 }
+  ]
+};
+
+const CATEGORIES = [
+    { name: "Tekanan", dmg: 15, color: "bg-blue-500", label: "Aman", icon: <Shield size={16}/> },
+    { name: "Karakteristik Fluida Lainnya", dmg: 20, color: "bg-teal-500", label: "Menengah", icon: <Target size={16}/> },
+    { name: "Hukum Archimedes", dmg: 25, color: "bg-orange-500", label: "Kritis", icon: <Flame size={16}/> },
+    { name: "Hukum Pascal", dmg: 35, color: "bg-red-600", label: "Mematikan", icon: <Zap size={16}/> }
+];
+
+const COLORS = [
+  { name: 'Slate', class: 'bg-slate-700' },
+  { name: 'Navy', class: 'bg-blue-800' },
+  { name: 'Red', class: 'bg-red-800' },
+  { name: 'Green', class: 'bg-emerald-800' },
+  { name: 'Gold', class: 'bg-amber-600' }
+];
+
+const DURATIONS = [5, 10, 15];
+
+const App = () => {
+  const [gameState, setGameState] = useState('SETUP'); 
+  const [turn, setTurn] = useState(1);
+  const [p1, setP1] = useState({ name: "Admiral A", hp: 100, color: COLORS[1] });
+  const [p2, setP2] = useState({ name: "Admiral B", hp: 100, color: COLORS[2] });
+  const [duration, setDuration] = useState(5);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [message, setMessage] = useState("Sistem Siap Tempur!");
+  const [winner, setWinner] = useState(null);
+  const [effect, setEffect] = useState(null);
+  const [showDev, setShowDev] = useState(false);
+
+  const waves = useMemo(() => Array.from({ length: 6 }, (_, i) => i), []);
+
+  useEffect(() => {
+    let timer;
+    if (gameState === 'PLAYING' && timeLeft > 0) {
+      timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+    } else if (timeLeft === 0 && gameState === 'PLAYING') {
+      determineWinner();
+    }
+    return () => clearInterval(timer);
+  }, [gameState, timeLeft]);
+
+  const determineWinner = () => {
+    let winMsg = p1.hp > p2.hp ? p1.name : (p2.hp > p1.hp ? p2.name : "Seri!");
+    setWinner(winMsg);
+    setGameState('FINISHED');
+  };
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  const initiateBattle = (firstPlayer) => {
+    setTurn(firstPlayer);
+    setTimeLeft(duration * 60);
+    setGameState('PLAYING');
+  };
+
+  const selectCategory = (catName) => {
+    const list = BANK_SOAL[catName];
+    const q = list[Math.floor(Math.random() * list.length)];
+    setCurrentQuestion({ ...q, category: catName });
+  };
+
+  const cleanFormula = (text) => {
+      return text.replace(/\$(.*?)\$/g, '<span class="italic font-serif text-blue-900 drop-shadow-sm">$1</span>');
+  };
+
+  const handleAnswer = (idx) => {
+    const isCorrect = idx === currentQuestion.c;
+    const defenderId = turn === 1 ? 2 : 1;
+    
+    if (isCorrect) {
+      const dmg = currentQuestion.dmg;
+      const setDefender = defenderId === 1 ? setP1 : setP2;
+      setDefender(p => ({ ...p, hp: Math.max(0, p.hp - dmg) }));
+      setEffect({ target: defenderId, type: 'attack' });
+      setMessage(`Tembakan Akurat! -${dmg} HP untuk lawan!`);
+    } else {
+      const setAttacker = turn === 1 ? setP1 : setP2;
+      setAttacker(p => ({ ...p, hp: Math.max(0, p.hp - 10) }));
+      setEffect({ target: turn, type: 'fail' });
+      setMessage("Kalkulasi Meleset! Meriam Meledak (-10 HP)!");
+    }
+
+    setTimeout(() => {
+        setEffect(null);
+        if (p1.hp <= 0 || p2.hp <= 0) {
+            determineWinner();
+        } else {
+            setTurn(defenderId);
+            setMessage(`Sekarang Giliran ${defenderId === 1 ? p1.name : p2.name}`);
+        }
+    }, 1500);
+    setCurrentQuestion(null);
+  };
+
+  return (
+    <div className="min-h-screen w-full relative overflow-hidden font-sans bg-sky-400">
+      
+      {/* BACKGROUND */}
+      <div className="absolute inset-0 z-0 flex flex-col">
+        <div className="h-[40%] bg-gradient-to-b from-sky-400 to-sky-200"></div>
+        <div className="h-[60%] bg-blue-600 relative overflow-hidden">
+            {waves.map(i => (
+                <div key={i} className="absolute w-[200%] h-32 bg-white/10 rounded-[100%] animate-wave"
+                    style={{ top: `${i * 12}%`, left: '-50%', animationDuration: `${12 + i}s` }}></div>
+            ))}
+        </div>
+      </div>
+
+      <div className="relative z-10 w-full min-h-screen flex flex-col items-center justify-between py-6 px-4">
+        
+        {/* DEV TRIGGER */}
+        <button onClick={() => setShowDev(true)} className="absolute top-4 right-4 bg-white/20 p-2 rounded-full backdrop-blur-md border border-white/30 text-white z-50 hover:bg-white/40"><Info size={20} /></button>
+
+        {/* --- SETUP --- */}
+        {gameState === 'SETUP' && (
+          <div className="bg-slate-900/80 backdrop-blur-xl p-8 rounded-[3rem] shadow-2xl border border-white/20 max-w-4xl w-full text-white animate-in zoom-in">
+            <h1 className="text-4xl font-black text-center italic uppercase mb-2 drop-shadow-lg tracking-tighter">Fluid Fortress: Pressure Battle</h1>
+            <p className="text-center text-blue-300 font-bold text-[10px] tracking-[0.5em] mb-10 opacity-80 uppercase">Simulasi Fisika Fluida Statis</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              <div className="space-y-4 bg-white/5 p-6 rounded-3xl border border-white/10">
+                <input className="w-full bg-white/10 border border-white/20 p-3 rounded-xl outline-none focus:border-blue-500 font-bold" value={p1.name} onChange={e => setP1({...p1, name: e.target.value})} placeholder="Nama Admiral 1" />
+                <div className="flex gap-2 justify-center">
+                  {COLORS.map(c => (
+                    <button key={c.name} onClick={() => setP1({...p1, color: c})} className={`w-8 h-8 rounded-full border-2 transition-all ${c.class} ${p1.color.name === c.name ? 'border-white scale-125' : 'border-transparent opacity-50'}`} />
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-4 bg-white/5 p-6 rounded-3xl border border-white/10">
+                <input className="w-full bg-white/10 border border-white/20 p-3 rounded-xl outline-none focus:border-red-500 font-bold text-right" value={p2.name} onChange={e => setP2({...p2, name: e.target.value})} placeholder="Nama Admiral 2" />
+                <div className="flex gap-2 justify-center md:justify-end">
+                  {COLORS.map(c => (
+                    <button key={c.name} onClick={() => setP2({...p2, color: c})} className={`w-8 h-8 rounded-full border-2 transition-all ${c.class} ${p2.color.name === c.name ? 'border-white scale-125' : 'border-transparent opacity-50'}`} />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-10 text-center">
+                <p className="text-xs font-black uppercase text-blue-300 mb-4 tracking-widest">Durasi Pertempuran</p>
+                <div className="flex justify-center gap-4">
+                    {DURATIONS.map(d => (
+                        <button key={d} onClick={() => setDuration(d)} className={`px-6 py-3 rounded-xl font-bold transition-all border-2 ${duration === d ? 'bg-blue-600 border-white text-white' : 'bg-white/10 border-white/20 text-white/60 hover:bg-white/20'}`}>
+                            {d} Menit
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <button onClick={() => setGameState('START_CHOICE')} className="w-full bg-blue-600 hover:bg-blue-500 py-5 rounded-2xl font-black text-xl shadow-xl transition-all active:scale-95 uppercase tracking-widest">Luncurkan Armada</button>
+          </div>
+        )}
+
+        {/* --- CHOICE --- */}
+        {gameState === 'START_CHOICE' && (
+          <div className="bg-slate-900/70 backdrop-blur-2xl p-12 rounded-[4rem] shadow-2xl text-center text-white border border-white/20 animate-in fade-in">
+             <Swords className="mx-auto mb-6 text-yellow-400" size={50} />
+             <h2 className="text-2xl font-black mb-10 uppercase tracking-widest">Penyerang Utama?</h2>
+             <div className="grid grid-cols-2 gap-6">
+                <button onClick={() => initiateBattle(1)} className="group flex flex-col items-center gap-4">
+                    <div className={`${p1.color.class} p-8 rounded-3xl shadow-xl group-hover:scale-110 transition-transform`}><Ship size={40} className="text-white" /></div>
+                    <span className="font-bold uppercase">{p1.name}</span>
+                </button>
+                <button onClick={() => initiateBattle(2)} className="group flex flex-col items-center gap-4">
+                    <div className={`${p2.color.class} p-8 rounded-3xl shadow-xl group-hover:scale-110 transition-transform`}><Ship size={40} className="text-white" /></div>
+                    <span className="font-bold uppercase">{p2.name}</span>
+                </button>
+             </div>
+          </div>
+        )}
+
+        {/* --- PLAYING --- */}
+        {gameState === 'PLAYING' && (
+          <div className="w-full max-w-7xl flex-1 flex flex-col justify-between items-center relative">
+            
+            <div className="flex gap-4 items-center">
+                <div className="bg-black/60 backdrop-blur-md px-10 py-2 rounded-full text-white font-bold italic border border-white/10 shadow-lg text-sm">{message}</div>
+                <div className="bg-blue-900/90 backdrop-blur-md px-6 py-2 rounded-full text-white font-black flex items-center gap-3 border border-blue-400/30">
+                    <Clock size={18} className="text-yellow-400" />
+                    <span className="font-mono text-xl">{formatTime(timeLeft)}</span>
+                </div>
+            </div>
+
+            <div className="w-full flex justify-between items-center flex-1">
+                <div className={`relative flex flex-col items-center transition-all duration-700 ${turn === 1 ? 'scale-110' : 'scale-90 opacity-60'}`}>
+                    <div className="absolute -top-16 w-40">
+                        <div className="h-3 bg-black/40 rounded-full border border-white/20 overflow-hidden shadow-inner">
+                            <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500" style={{width: `${p1.hp}%`}}></div>
+                        </div>
+                    </div>
+                    <div className="relative animate-bob">
+                        <div className={`${p1.color.class} w-56 h-20 rounded-b-[45%] rounded-t-lg border-b-[6px] border-black/40 shadow-2xl relative`}>
+                           <div className="absolute -top-10 left-8 w-10 h-14 bg-white/10 rounded-t-md"></div>
+                        </div>
+                        {effect?.target === 1 && <div className={`absolute inset-0 rounded-full blur-3xl animate-ping ${effect.type === 'fail' ? 'bg-red-500' : 'bg-orange-500'}`}></div>}
+                    </div>
+                    <p className="mt-4 font-black text-white text-xs tracking-widest uppercase">{p1.name} (HP: {p1.hp})</p>
+                </div>
+
+                <div className={`relative flex flex-col items-center transition-all duration-700 ${turn === 2 ? 'scale-110' : 'scale-90 opacity-60'}`}>
+                    <div className="absolute -top-16 w-40">
+                        <div className="h-3 bg-black/40 rounded-full border border-white/20 overflow-hidden shadow-inner">
+                            <div className="h-full bg-gradient-to-l from-red-400 to-red-600 transition-all duration-500" style={{width: `${p2.hp}%`}}></div>
+                        </div>
+                    </div>
+                    <div className="relative animate-bob-reverse scale-x-[-1]">
+                        <div className={`${p2.color.class} w-56 h-20 rounded-b-[45%] rounded-t-lg border-b-[6px] border-black/40 shadow-2xl relative`}>
+                           <div className="absolute -top-10 left-8 w-10 h-14 bg-white/10 rounded-t-md"></div>
+                        </div>
+                        {effect?.target === 2 && <div className={`absolute inset-0 rounded-full blur-3xl animate-ping ${effect.type === 'fail' ? 'bg-red-500' : 'bg-orange-500'}`}></div>}
+                    </div>
+                    <p className="mt-4 font-black text-white text-xs tracking-widest uppercase">{p2.name} (HP: {p2.hp})</p>
+                </div>
+            </div>
+
+            {!currentQuestion && (
+                <div className="w-full flex flex-col items-center gap-4 mb-4">
+                    <div className="flex items-center gap-2 bg-yellow-500/20 px-3 py-1 rounded-full border border-yellow-500/40 animate-pulse">
+                        <AlertCircle size={14} className="text-yellow-500" />
+                        <span className="text-white text-[9px] font-black uppercase tracking-widest">Pilih Strategi Serangan</span>
+                    </div>
+                    <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-4 animate-in slide-in-from-bottom">
+                        {CATEGORIES.map(cat => (
+                            <button key={cat.name} onClick={() => selectCategory(cat.name)} 
+                                className="group relative bg-slate-900/80 backdrop-blur-md p-5 rounded-[2rem] border border-white/10 hover:border-white/50 transition-all active:scale-95 flex flex-col items-center overflow-hidden"
+                            >
+                                <div className={`absolute top-0 right-0 px-3 py-1 ${cat.color} rounded-bl-2xl shadow-lg flex items-center gap-1`}>
+                                    <span className="text-white font-black text-[10px]">{cat.dmg}</span>
+                                </div>
+                                <div className={`${cat.color} p-3 rounded-2xl mb-3 text-white shadow-lg group-hover:scale-110 transition-transform`}>{cat.icon}</div>
+                                <span className="text-white font-black text-[10px] uppercase mb-1 tracking-tighter text-center h-8 flex items-center">{cat.name}</span>
+                                <div className={`text-[8px] font-black uppercase px-3 py-0.5 rounded-full border ${cat.dmg >= 30 ? 'bg-red-500/20 border-red-500 text-red-400' : 'bg-blue-500/20 border-blue-500 text-blue-400'}`}>
+                                    {cat.label}
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {currentQuestion && (
+                <div className="absolute inset-0 z-[100] flex items-center justify-center p-4 bg-blue-900/40 backdrop-blur-md">
+                    <div className="bg-white/95 backdrop-blur-lg rounded-[3rem] p-10 max-w-3xl w-full shadow-2xl border-b-[12px] border-blue-600 animate-in zoom-in duration-200">
+                        <div className="flex justify-between items-center mb-6">
+                            <span className="bg-blue-600 text-white px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">{currentQuestion.category}</span>
+                            <div className="flex items-center gap-2 bg-red-100 px-4 py-1 rounded-full border border-red-200">
+                                <Flame size={18} className="text-red-600" />
+                                <span className="text-red-700 font-black text-sm">{currentQuestion.dmg} Damage Point</span>
+                            </div>
+                        </div>
+                        <h3 className="text-2xl font-bold text-slate-800 mb-8 leading-relaxed" 
+                            dangerouslySetInnerHTML={{ __html: cleanFormula(currentQuestion.q) }}>
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {currentQuestion.a.map((opt, idx) => (
+                                <button key={idx} onClick={() => handleAnswer(idx)} className="text-left p-6 rounded-2xl border-2 border-slate-100 hover:border-blue-600 hover:bg-blue-50 font-bold text-slate-700 transition-all active:scale-95 shadow-sm">
+                                    <span dangerouslySetInnerHTML={{ __html: cleanFormula(opt) }}></span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+          </div>
+        )}
+
+        {/* --- FINISH --- */}
+        {gameState === 'FINISHED' && (
+          <div className="bg-slate-900/90 backdrop-blur-2xl p-12 rounded-[3.5rem] text-center border border-white/20 shadow-2xl animate-in zoom-in">
+            <Trophy className="mx-auto text-yellow-400 mb-4 animate-bounce" size={80} />
+            <h2 className="text-4xl font-black text-white italic uppercase mb-2 tracking-tighter">Misi Berhasil!</h2>
+            <p className="text-xl font-bold text-blue-300 mb-10">Sang Penakluk Lautan: <span className="text-white underline">{winner}</span></p>
+            <button onClick={() => setGameState('SETUP')} className="bg-blue-600 text-white px-12 py-5 rounded-3xl font-black hover:bg-blue-500 transition-all uppercase tracking-widest shadow-xl">Atur Ulang Armada</button>
+          </div>
+        )}
+
+        {/* DEV INFO */}
+        {showDev && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in">
+            <div className="bg-slate-900 border border-white/20 p-8 rounded-[3rem] max-w-sm w-full text-white relative shadow-2xl">
+              <button onClick={() => setShowDev(false)} className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors"><X size={24} /></button>
+              <h2 className="text-xl font-black italic uppercase mb-8 flex items-center gap-3">
+                <Zap className="text-yellow-400" /> Profil Dev
+              </h2>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
+                  <User className="text-blue-400" size={24} />
+                  <div>
+                    <p className="text-[9px] text-white/40 uppercase font-black">Admiral Developer</p>
+                    <p className="font-bold">Adzkia Sufi Fauziah</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
+                  <School className="text-emerald-400" size={24} />
+                  <div>
+                    <p className="text-[9px] text-white/40 uppercase font-black">Pangkalan Ops</p>
+                    <p className="font-bold">SMAN 1 Sleman</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
+                  <Instagram className="text-pink-400" size={24} />
+                  <div>
+                    <p className="text-[9px] text-white/40 uppercase font-black">Radar Sosial</p>
+                    <p className="font-bold">@adzkiasf</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      <style>{`
+        @keyframes wave {
+          from { transform: translateX(-50%) skewY(0deg); }
+          50% { transform: translateX(-48%) skewY(1deg); }
+          to { transform: translateX(-50%) skewY(0deg); }
+        }
+        @keyframes bob {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-12px); }
+        }
+        .animate-wave { animation: wave infinite ease-in-out; }
+        .animate-bob { animation: bob 4s infinite ease-in-out; }
+        .animate-bob-reverse { animation: bob 4s infinite ease-in-out; animation-delay: -2s; }
+      `}</style>
+    </div>
+  );
+};
+
+export default App;
+
